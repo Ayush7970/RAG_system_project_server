@@ -1,53 +1,27 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from routes import users
-import os
-
-
-load_dotenv()
+from routes.users import router as userRoutes
+from routes.projects import router as projectRoutes
+from routes.files import router as filesRoutes
+from routes.files import router as chatsRoutes
 
 # Create FastAPI app
 app = FastAPI(
     title="Six-Figure AI Engineering API",
     description="Backend API for Six-Figure AI Engineering application",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(users.router)
-
-
-# Health check endpoints
-@app.get("/")
-async def root():
-    return {"message": "Six-Figure AI Engineering app is running!"}
-
-@app.get("/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "version": "1.0.0"
-    }
-
-
-# @app.get("/posts")
-# async def get_all_posts():
-#     """Get all the post"""
-#     try:
-#         result = supabase.table("posts").select("*").order("created_at", desc=True).execute()
-#         return result.data
-#     except:
-#         raise HTTPException(status_code=50, detail=str(e))
-    
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+app.include_router(userRoutes, prefix="/api")
+app.include_router(projectRoutes, prefix="")
+app.include_router(filesRoutes, prefix="")
+app.include_router(chatsRoutes, prefix="")
